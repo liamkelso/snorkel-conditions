@@ -483,19 +483,34 @@ async function fetchTideData(lat, lon) {
 }
 
 function addTideStationMarkers(stations) {
+  // Remove any existing markers
   tideMarkers.forEach((m) => m.setMap(null));
   tideMarkers = [];
+  
+  // Create a LatLngBounds object to automatically adjust the map's viewport
+  const bounds = new google.maps.LatLngBounds();
+  
   stations.forEach((station, index) => {
+    const position = { lat: station.lat, lng: station.lng };
     const marker = new google.maps.Marker({
-      position: { lat: station.lat, lng: station.lng },
-      map,
+      position: position,
+      map: map,
       title: station.name,
       label: (index + 1).toString()
     });
     tideMarkers.push(marker);
+    
+    // Extend the bounds to include this marker's position
+    bounds.extend(marker.getPosition());
+    
+    // Add a click listener to open the station details when the marker is clicked
     marker.addListener("click", () => showTideStationDetail(index));
   });
+  
+  // Adjust the map viewport so that all markers are visible
+  map.fitBounds(bounds);
 }
+
 
 function displayTideData(tideData) {
   tideStationsData = tideData;
