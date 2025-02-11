@@ -1,0 +1,529 @@
+/* =======================
+   GENERAL PAGE STYLING
+   ======================= */
+   body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    color: #0f0e0e;
+    background: #000;
+    overflow-x: hidden;
+  }
+  
+  /* Background Video */
+  .video-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+  }
+  #background-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* ============================
+     TOP BAR & FORMS CONTAINERS
+     ============================ */
+  .top-bar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    padding-right: 20px;
+  }
+  .auth-buttons button {
+    margin: 0 5px;
+    padding: 8px 14px;
+    font-size: 0.95rem;
+    color: #0072ff;
+    background: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  .auth-buttons button:hover {
+    background-color: #0072ff;
+    color: #fff;
+    transform: translateY(-2px);
+  }
+  .forms-container,
+  .favorites-container {
+    position: fixed;
+    top: 60px;
+    right: 0;
+    width: 250px;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 15px;
+    box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.4);
+    border-radius: 0 0 0 10px;
+    z-index: 999;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .forms-container h3,
+  .favorites-container h3 {
+    margin-top: 0;
+  }
+  input[type="text"],
+  input[type="password"] {
+    width: 90%;
+    margin-bottom: 10px;
+    padding: 8px;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
+  /* =======================
+     MAIN CONTENT CONTAINER
+     ======================= */
+  .container {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    width: 90%;
+    max-width: 700px;
+    margin: 100px auto 20px;
+  }
+  .header h1 {
+    font-size: clamp(1.8rem, 7vw, 3rem);
+    margin: 0;
+    letter-spacing: -2px;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    white-space: nowrap;
+  }
+  .header p {
+    font-size: 1.2rem;
+    color: #e0e0e0;
+    margin: 10px 0 20px;
+  }
+  
+  /* Wave Text Animation */
+  .wave-text span {
+    display: inline-block;
+    animation: wave-animation 2.4s ease-in-out infinite;
+  }
+  .wave-text span:nth-child(1) { animation-delay: 0s; }
+  .wave-text span:nth-child(2) { animation-delay: 0.1s; }
+  .wave-text span:nth-child(3) { animation-delay: 0.2s; }
+  .wave-text span:nth-child(4) { animation-delay: 0.3s; }
+  .wave-text span:nth-child(5) { animation-delay: 0.4s; }
+  .wave-text span:nth-child(6) { animation-delay: 0.5s; }
+  .wave-text span:nth-child(7) { animation-delay: 0.6s; }
+  .wave-text span:nth-child(8) { animation-delay: 0.7s; }
+  .wave-text span:nth-child(9) { animation-delay: 0.8s; }
+  .wave-text span:nth-child(10) { animation-delay: 0.9s; }
+  .wave-text span:nth-child(11) { animation-delay: 1s; }
+  .wave-text span:nth-child(12) { animation-delay: 1.1s; }
+  @keyframes wave-animation {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  /* Form Container */
+  .form-container {
+    background: rgba(255, 255, 255, 0.3);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: left;
+    color: #000;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  }
+  .form-container h2 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: #222;
+  }
+  .form-container label {
+    font-size: 1.1rem;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  }
+  
+  /* Map Styling */
+  #map {
+    width: 100%;
+    height: 300px;
+    border: 2px solid #333;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  
+  /* Autocomplete Input */
+  #location {
+    width: 80%;
+    max-width: 400px;
+    padding: 10px;
+    font-size: 1.1rem;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    transition: box-shadow 0.3s;
+  }
+  #location:focus {
+    box-shadow: 0 0 8px rgba(0, 114, 255, 0.7);
+  }
+  
+  /* Button Styling */
+  button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #0072ff;
+    background: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 10px;
+  }
+  button:hover {
+    background-color: #0072ff;
+    color: #fff;
+    transform: translateY(-2px);
+  }
+  
+  /* Button Ripple Effect (Micro-interaction) */
+  button {
+    position: relative;
+    overflow: hidden;
+  }
+  button::after {
+    content: "";
+    position: absolute;
+    background: rgba(0, 114, 255, 0.3);
+    border-radius: 50%;
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.5s, opacity 1s;
+  }
+  button:active::after {
+    transform: scale(4);
+    opacity: 1;
+    transition: 0s;
+  }
+  
+  /* Loader */
+  .loader {
+    font-size: 1.2rem;
+    color: #fff;
+    text-align: center;
+    margin: 20px 0;
+  }
+  
+  /* Results Section */
+  .result {
+    margin-top: 20px;
+    font-size: 1.1rem;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    color: #f0f0f0;
+    display: none;
+    text-align: left;
+  }
+  
+  /* Responsive Overlay (Modal Replacement) */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 1em;
+  }
+  
+  /* --- Modal Inner Container (Fixed Size & Enhanced Visuals, Consistent Across Devices) --- */
+/* --- Modal Inner Container (Fixed Size & Enhanced Visuals) --- */
+.modal-inner {
+    width: 90%;
+    max-width: 700px;
+    height: calc(var(--vh, 1vh) * 80);  /* 80% of the actual viewport height */
+    margin: calc(var(--vh, 1vh) * 5) auto; /* 5% margin on top and bottom */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
+    /* Subtle gradient with a light blue overlay and optional pattern */
+    background: linear-gradient(135deg, #e0f7fa, #ffffff);
+    background-image: url("path/to/subtle-pattern.png"), linear-gradient(135deg, #e0f7fa, #ffffff);
+    background-blend-mode: overlay;
+    color: #111;
+    transition: transform 0.3s ease;
+    overflow-y: auto;       /* The entire modal scrolls as one unit */
+    position: relative;     /* For positioning the close button */
+  }
+  
+  
+  
+  /* --- Close Button --- */
+  .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;            /* Fully inside the modal */
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: #333;
+    transition: color 0.3s;
+  }
+  .close:hover {
+    color: #ff0000;
+  }
+  @media (max-width: 600px) {
+    .modal-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      margin: 0;
+      padding: 15px;
+    }
+    .close {
+      top: 10px;
+      right: 10px;
+    }
+  }
+  .close-auth {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    line-height: 1;
+    padding: 0;
+  }
+  .close-auth:hover {
+    color: #ff0000;
+  }
+  
+  /* Forecast Table styling in the overlay */
+  .forecast-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  .forecast-table th,
+  .forecast-table td {
+    border: 1px solid #ccc;
+    padding: 6px; /* reduced from 8px */
+    text-align: center;
+    font-size: 0.9rem; /* slightly smaller text */
+  }
+  
+  .forecast-table th {
+    background-color: #f0f0f0;
+  }
+  
+  /* Tide Station Links & Favorites */
+  .tide-station, .favorite-spot {
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.3s;
+  }
+  .tide-station:hover {
+    color: #ffa500;
+  }
+  .favorite-spot {
+    color: #111;
+    display: block;
+    margin-bottom: 5px;
+    transition: transform 0.2s, color 0.3s;
+  }
+  .favorite-spot:hover, .favorite-spot:focus {
+    transform: scale(1.03);
+    color: #0072ff;
+  }
+  /* Remove favorite images */
+  .favorite-item img {
+    display: none;
+  }
+  
+  /* Keyboard Focus Styles for Accessibility */
+  button:focus,
+  .favorite-spot:focus,
+  a:focus {
+    outline: 3px solid #0072ff;
+    outline-offset: 2px;
+  }
+  
+  /* Footer */
+  footer {
+    margin-top: 20px;
+    text-align: center;
+  }
+  footer a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  footer a:hover {
+    text-decoration: underline;
+  }
+  @media (max-width: 600px) {
+    .forms-container, .favorites-container {
+      width: 90%;
+      right: 5%;
+    }
+    #map {
+      height: 200px;
+    }
+    .modal-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      margin: 0;
+      padding: 15px;
+    }
+  }
+  
+  /* --- Notification Banner --- */
+  #notification {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 0, 0, 0.8);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: none;
+    z-index: 1200;
+  }
+  #notification.success {
+    background: rgba(0, 128, 0, 0.8);
+  }
+  
+  /* --- Semi-Transparent Overlay for Video Background --- */
+  .video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 0;
+  }
+  
+  /* --- Modal Enhancements --- */
+  .modal {
+    transition: opacity 0.3s ease;
+  }
+  /* .modal-inner already defined above */
+  
+  /* --- Map Legend --- */
+  #mapLegend {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    color: #000;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1100;
+  }
+  
+  /* --- Enhanced Favorites List --- */
+  .favorites-container {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+  }
+  .favorite-item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding: 5px;
+  }
+  .favorite-item .favorite-info {
+    flex-grow: 1;
+  }
+  .favorite-item input[type="checkbox"] {
+    margin-right: 10px;
+  }
+  
+  /* --- Dark/Light Toggle Button --- */
+  #toggleMode {
+    margin-left: 10px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  
+  /* --- Modal Two‑Column Layout & Header --- */
+  .modal-location {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #00796b;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+  }
+  .modal-content-inner {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: stretch;
+    flex: 1;
+    overflow: hidden;
+  }
+  .modal-text {
+    flex: 1;
+    min-width: 300px;
+    overflow: visible;
+  }
+  .modal-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow: visible;
+  }
+  /* Remove forced equal height so that the right column contents (tide chart and forecast) display naturally without individual scrolling */
+  .modal-chart,
+  .modal-forecast {
+    overflow: visible;
+  }
+  
+  /* --- Weather Overview Styling --- */
+  .weather-overview {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .weather-overview li {
+    margin-bottom: 5px;
+  }

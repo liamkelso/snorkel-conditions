@@ -1,0 +1,17 @@
+{
+  "name": "snorkle",
+  "version": "1.0.0",
+  "description": "A project for checking snorkeling conditions, including tides and weather.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Liam Kelso",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.1"
+  }
+}

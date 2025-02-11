@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Snorkel Conditions</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <!-- Google Maps & Places -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAL5MD8h8tceYlUdW4bwx3aqIUVPgWjWkY&libraries=places" async defer></script>
+  <!-- Chart.js for tide charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Notification Banner -->
+  <div id="notification" aria-live="assertive"></div>
+  
+  <!-- Video Background and an overlay for readability -->
+  <div class="video-overlay"></div>
+  <div class="video-background">
+    <video autoplay muted loop id="background-video">
+      <source src="reef.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </div>
+  
+  <!-- Top Bar with authentication and dark/light toggle -->
+  <div class="top-bar">
+    <div class="auth-buttons">
+      <button id="registerLink">Register</button>
+      <button id="signInLink">Sign In</button>
+      <button id="signOutLink" style="display:none;">Sign Out</button>
+      <button id="viewFavoritesLink" style="display:none;">View Favorites</button>
+      <button id="helpButton">Help</button>
+    </div>
+  </div>
+
+  <!-- Forms Container (Registration/Sign In) -->
+  <div id="formsContainer" class="forms-container" aria-live="polite" style="display: none;">
+    <!-- Registration Form -->
+    <div id="registerForm" class="form-panel" style="display: none; position: relative;">
+      <button class="close-auth" aria-label="Close">&times;</button>
+      <h3>Register</h3>
+      <label for="registerUsername">Username:</label>
+      <input type="text" id="registerUsername" placeholder="e.g. diver123" />
+      <label for="registerPassword">Password:</label>
+      <input type="password" id="registerPassword" placeholder="Min 8 chars, letters & digits" />
+      <button id="registerButton">Register</button>
+    </div>
+    <!-- Sign In Form -->
+    <div id="signInForm" class="form-panel" style="display: none; position: relative;">
+      <button class="close-auth" aria-label="Close">&times;</button>
+      <h3>Sign In</h3>
+      <label for="signInUsername">Username:</label>
+      <input type="text" id="signInUsername" placeholder="e.g. diver123" />
+      <label for="signInPassword">Password:</label>
+      <input type="password" id="signInPassword" placeholder="Your password" />
+      <button id="signInButton">Sign In</button>
+    </div>
+  </div>
+  
+  <!-- Enhanced Favorites Container -->
+  <div id="favoritesContainer" class="favorites-container" style="display: none;" aria-live="polite">
+    <h3>Your Favorite Snorkel Spots!</h3>
+    <div id="favoritesList"></div>
+    <button id="deleteSelectedFavorites">Delete Selected</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <header class="header">
+      <h1 class="wave-text">
+        <span>S</span><span>n</span><span>o</span><span>r</span><span>k</span><span>e</span><span>l</span><span> </span><span>T</span><span>i</span><span>m</span><span>e</span>
+      </h1>
+      <p>Check if it's a great day to explore the underwater world!</p>
+    </header>
+    <main>
+      <!-- Location Selection -->
+      <div class="form-container">
+        <h2>Select Your Location</h2>
+        <p>Click on the map or search below.</p>
+        <p>Select the numbered icons or scroll down to get more information on each location.</p>
+        <!-- Map -->
+        <label for="mapText">Select your snorkeling location on the map:</label>
+        <div id="map" aria-label="Map for location selection"></div>
+        <hr>
+        <!-- Autocomplete Input -->
+        <div>
+          <label for="location">Or Search for a Location:</label>
+          <input type="text" id="location" placeholder="Start typing a location..." />
+          <!-- The "Check Conditions" button was removed -->
+        </div>
+      </div>
+      <!-- Loader -->
+      <div id="loader" class="loader" style="display:none;">Loading...</div>
+      <!-- Modal for details and charts -->
+      <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-inner">
+          <button id="close-modal" class="close" aria-label="Close details">&times;</button>
+          <div id="modal-content"></div>
+        </div>
+      </div>
+      <!-- Results Section -->
+      <div id="result" class="result"></div>
+    </main>
+    <footer>
+      <a href="https://github.com/liamkelso" target="_blank" rel="noopener noreferrer">
+        Made by Liam Kelso
+      </a>
+    </footer>
+  </div>
+  <!-- Main JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>
