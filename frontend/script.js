@@ -735,6 +735,7 @@ function showFullStationDetail(station, weatherData) {
   const rightColumnHTML = `
     <div class="modal-right">
       <div class="modal-chart">
+      <p><strong>Tide Forecast (ft)</strong></p> 
         ${tideChartHTML}
       </div>
       <div class="modal-forecast">
