@@ -1,6 +1,6 @@
 # Snorkel Conditions
 
-Snorkel Conditions is a responsive web application that aggregates real-time NOAA tide predictions and OpenWeather API data to help users determine if it's a great day for snorkeling. The application integrates Google Maps for interactive location selection and uses Chart.js to visualize tide charts. Users can register, sign in, and save their favorite snorkeling spots for quick reference.
+Snorkel Conditions is a responsive web application that aggregates real-time NOAA tide predictions and OpenWeather API data to help users determine if there are good conditions for snorkeling. The application integrates Google Maps for interactive location selection and uses Chart.js to visualize tide charts. Users can register, sign in, and save their favorite snorkeling spots for quick reference.
 
 ## Features
 
