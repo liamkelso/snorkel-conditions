@@ -13,7 +13,7 @@ Snorkel Conditions is a responsive web application that aggregates real-time NOA
 
 ## Usage
 
-Visit [snorkelconditions.com](https://snorkelconditions.com) in your browser. Simply select a location on the map or use the search box, and the site will load current weather and tide data. Click on a tide station marker or station name for a detailed view.
+Visit [snorkelconditions.com] (https://snorkelconditions.com) in your browser. Simply select a location on the map or use the search box, and the site will load current weather and tide data. Click on a tide station marker or station name for a detailed view.
 
 ## Technologies Used
 
