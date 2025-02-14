@@ -5,22 +5,22 @@ let vh = window.innerHeight * 0.01;
 document.documentElement.style.setProperty('--vh', `${vh}px`);
 
 
-// -----------------------------
-// Global Variables & API Keys
-// -----------------------------
+/*
+Global Variables & API Keys
+*/ 
 let autocomplete;
 let selectedPlace;
 let allTideStations = null;
-const OPENWEATHER_API_KEY = "b0a3cf6cb3e481420a128390e596ef94"; // Replace with your key
+const OPENWEATHER_API_KEY = "b0a3cf6cb3e481420a128390e596ef94";
 let currentWeatherData = null;
 let map = null;
 let tideMarkers = [];
 let userMarker = null;
 let tideStationsData = null;
 
-// -----------------------------
-// New: Clearer In‑Page Notifications
-// -----------------------------
+/*
+Notifications
+*/ 
 function showNotification(message, type = 'error', duration = 3000) {
   const notification = document.getElementById("notification");
   notification.textContent = message;
@@ -38,9 +38,7 @@ function showError(message) {
 }
 
 
-// -----------------------------
-// New: Tide Chart using Chart.js
-// -----------------------------
+//Makes the tide chart shown in the innerModal
 function renderTideChart(tidePredictions) {
   // Create or get a canvas element in the modal
   let chartCanvas = document.getElementById("tideChart");
@@ -86,18 +84,18 @@ function renderTideChart(tidePredictions) {
   });
 }
 
-// -----------------------------
-// Helper Functions (General)
-// -----------------------------
+//Start of helper functions
 function showLoader(show = true) {
   const loader = document.getElementById("loader");
   loader.style.display = show ? "block" : "none";
 }
 
+//Degres to radians
 function toRadians(deg) {
   return deg * Math.PI / 180;
 }
 
+//Compute the distance between two coordinates
 function haversineDistance(lat1, lon1, lat2, lon2) {
   const R = 6371;
   const dLat = toRadians(lat2 - lat1);
@@ -119,9 +117,8 @@ document.querySelectorAll(".close-auth").forEach(btn => {
   btn.addEventListener("click", closeAuthForms);
 });
 
-// -----------------------------
+
 // User Authentication & Favorites
-// -----------------------------
 function getAllUsers() {
   const usersJSON = localStorage.getItem("snorkelUsers");
   return usersJSON ? JSON.parse(usersJSON) : {};
@@ -130,27 +127,32 @@ function getAllUsers() {
 function saveAllUsers(usersObj) {
   localStorage.setItem("snorkelUsers", JSON.stringify(usersObj));
 }
-
+//Makes sure password has 8 characters, with letters and numbers
 function isValidPassword(password) {
   return password.length >= 8 && /[A-Za-z]/.test(password) && /[0-9]/.test(password);
 }
 
+//Registers user
 function registerUser(username, password) {
   const users = getAllUsers();
+  //Ensures no duplicate usernames
   if (users[username]) {
     showError("That username is already taken. Please choose another.");
     return false;
   }
+  //Checks password
   if (!isValidPassword(password)) {
     showError("Password must be at least 8 characters and contain letters and digits.");
     return false;
   }
+  //Connects username to password
   users[username] = { password };
   saveAllUsers(users);
   showNotification("Registration successful! You can now sign in.", 'success');
   return true;
 }
 
+//Sign in function
 function signInUser(username, password) {
   const users = getAllUsers();
   const userData = users[username];
@@ -158,6 +160,7 @@ function signInUser(username, password) {
     showError("No such user. Please register first.");
     return false;
   }
+  //Checks if password matches
   if (userData.password !== password) {
     showError("Incorrect password. Please try again.");
     return false;
@@ -190,9 +193,7 @@ function saveFavorites(username, favorites) {
   localStorage.setItem(key, JSON.stringify(favorites));
 }
 
-// -----------------------------
-// Enhanced Favorites Management
-// -----------------------------
+//Managing favorite tide stations
 function toggleFavoriteStation(stationObj) {
   const user = getCurrentUser();
   if (!user) {
