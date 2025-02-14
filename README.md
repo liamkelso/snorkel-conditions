@@ -17,7 +17,7 @@ Visit [snorkelconditions.com](https://snorkelconditions.com) in your browser. Si
 
 ## Technologies Used
 
-- **HTML5, CSS3, and JavaScript (ES6)**
+- **HTML5, CSS, and JavaScript (ES6)**
 - **Google Maps & Places API**
 - **OpenWeather API**
 - **NOAA Tides API**
