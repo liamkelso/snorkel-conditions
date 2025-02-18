@@ -772,27 +772,31 @@ function openModal(content) {
 }
 
 function closeModal() {
+  const modalInner = document.querySelector(".modal-inner");
+  if (modalInner) {
+    modalInner.classList.remove("help-modal");
+  }
   document.getElementById("modal").style.display = "none";
 }
 
-// -----------------------------
-// New: Help Function (Instructions)
-// -----------------------------
+
 function showHelp() {
   const helpContent = `
     <h2>Website Help</h2>
     <p>Welcome to Snorkel Conditions! Here’s how to use the website:</p>
     <ul>
       <li><strong>Select Location:</strong> Click on the map or type a location in the search box. Data loads automatically.</li>
-      <li><strong>Current Weather & Tide:</strong> The main area shows current weather (air temperature, wind, and cloud coverage) and tide information for your selected location.</li>
-      <li><strong>Detailed View:</strong> Click on any tide station marker (the numbered items on the map) or scroll down and click the station name to open a detailed overlay with extra info, including an hourly forecast.</li>
+      <li><strong>Current Weather & Tide:</strong> The main area shows current weather and tide information for your selected location.</li>
+      <li><strong>Detailed View:</strong> Click on any tide station marker or scroll down and click the station name to open a detailed overlay with extra info, including an hourly forecast.</li>
       <li><strong>Favorites:</strong> Once signed in, click the star (⭐) next to a tide station to save it as a favorite. Use the "View Favorites" button to see your saved spots.</li>
       <li><strong>Registration & Sign In:</strong> Use the Register and Sign In buttons (in the top bar) to create an account and enable the favorites feature.</li>
     </ul>
     <p>Enjoy exploring the conditions for your snorkeling adventure!</p>
   `;
   openModal(helpContent);
+  document.querySelector(".modal-inner").classList.add("help-modal");
 }
+
 
 // -----------------------------
 // Window onLoad Initialization

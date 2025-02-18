@@ -533,3 +533,13 @@
   .weather-overview li {
     margin-bottom: 5px;
   }
+
+  .modal-inner.help-modal {
+    max-width: 500px;   /* Increased from 400px to 500px */
+    width: 95%;
+    height: auto;
+    margin: 15vh auto;  /* Adjust margin if needed */
+    padding: 15px;      /* Slightly more padding */
+  }
+  
+  
