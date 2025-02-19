@@ -266,9 +266,8 @@
     padding: 1em;
   }
   
-  /* --- Modal Inner Container (Fixed Size & Enhanced Visuals, Consistent Across Devices) --- */
-/* --- Modal Inner Container (Fixed Size & Enhanced Visuals) --- */
-.modal-inner {
+  /* --- Modal Inner Container (Fixed Size & Enhanced Visuals) --- */
+  .modal-inner {
     width: 90%;
     max-width: 700px;
     height: calc(var(--vh, 1vh) * 80);  /* 80% of the actual viewport height */
@@ -278,7 +277,6 @@
     flex-direction: column;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     border-radius: 15px;
-    /* Subtle gradient with a light blue overlay and optional pattern */
     background: linear-gradient(135deg, #e0f7fa, #ffffff);
     background-image: url("path/to/subtle-pattern.png"), linear-gradient(135deg, #e0f7fa, #ffffff);
     background-blend-mode: overlay;
@@ -286,9 +284,9 @@
     transition: transform 0.3s ease;
     overflow-y: auto;       /* The entire modal scrolls as one unit */
     position: relative;     /* For positioning the close button */
+    /* ADDED OR MODIFIED FOR MOBILE FIX */
+    overflow-x: hidden; /* Prevent horizontal scrolling if something is wide */
   }
-  
-  
   
   /* --- Close Button --- */
   .close {
@@ -348,7 +346,6 @@
     text-align: center;
     font-size: 0.9rem; /* slightly smaller text */
   }
-  
   .forecast-table th {
     background-color: #f0f0f0;
   }
@@ -517,8 +514,8 @@
     flex-direction: column;
     gap: 20px;
     overflow: visible;
+    min-width: 0; /* prevents flex from forcing extra width */
   }
-  /* Remove forced equal height so that the right column contents (tide chart and forecast) display naturally without individual scrolling */
   .modal-chart,
   .modal-forecast {
     overflow: visible;
@@ -533,13 +530,25 @@
   .weather-overview li {
     margin-bottom: 5px;
   }
-
+  
   .modal-inner.help-modal {
-    max-width: 500px;   /* Increased from 400px to 500px */
+    max-width: 500px;
     width: 95%;
     height: auto;
-    margin: 15vh auto;  /* Adjust margin if needed */
-    padding: 15px;      /* Slightly more padding */
+    margin: 15vh auto;
+    padding: 15px;
   }
+  
+  /* ===========================
+     MOBILE FIX FOR PORTRAIT
+     =========================== */
+  @media (max-width: 600px) {
+    /* Stack the "text" and "chart" vertically so nothing gets cut off */
+    .modal-content-inner {
+      flex-direction: column;
+    }
+  }
+  
+  
   
   

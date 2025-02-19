@@ -772,13 +772,8 @@ function openModal(content) {
 }
 
 function closeModal() {
-  const modalInner = document.querySelector(".modal-inner");
-  if (modalInner) {
-    modalInner.classList.remove("help-modal");
-  }
   document.getElementById("modal").style.display = "none";
 }
-
 
 function showHelp() {
   const helpContent = `
