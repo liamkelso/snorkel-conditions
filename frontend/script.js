@@ -390,10 +390,6 @@ function displayLocationInfo(name, lat, lng) {
   if (!resultDiv) return;
   resultDiv.style.display = "block";
   resultDiv.innerHTML = `
-    <h2>Selected Location</h2>
-    <p><strong>${name}</strong></p>
-    <p><strong>Latitude:</strong> ${lat}</p>
-    <p><strong>Longitude:</strong> ${lng}</p>
     <div id="weatherInfo">
       <h3>Loading Weather Information...</h3>
     </div>
