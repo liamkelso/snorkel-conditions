@@ -10,13 +10,10 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAL5MD8h8tceYlUdW4bwx3aqIUVPgWjWkY&libraries=places" async defer></script>
   <!-- Chart.js for tide charts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Firebase App (the core Firebase SDK) -->
-<script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
-<!-- Firebase Authentication -->
-<script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js"></script>
-<!-- Firebase Firestore -->
-<script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"></script>
-
+  <!-- Firebase SDK (compat versions for global usage) -->
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <!-- Notification Banner -->
@@ -31,7 +28,7 @@
     </video>
   </div>
   
-  <!-- Top Bar with authentication and dark/light toggle -->
+  <!-- Top Bar with Firebase Authentication and other controls -->
   <div class="top-bar">
     <div class="auth-buttons">
       <button id="registerLink">Register</button>
@@ -40,16 +37,20 @@
       <button id="viewFavoritesLink" style="display:none;">View Favorites</button>
       <button id="helpButton">Help</button>
     </div>
+    <!-- Display current user info from Firebase (updated via script.js) -->
+    <div class="user-info" id="userInfo" style="display:none;">
+      Welcome, <span id="userDisplayName"></span>
+    </div>
   </div>
 
-  <!-- Forms Container (Registration/Sign In) -->
+  <!-- Forms Container (Firebase Authentication Forms) -->
   <div id="formsContainer" class="forms-container" aria-live="polite" style="display: none;">
     <!-- Registration Form -->
     <div id="registerForm" class="form-panel" style="display: none; position: relative;">
       <button class="close-auth" aria-label="Close">&times;</button>
-      <h3>Register</h3>
-      <label for="registerUsername">Username:</label>
-      <input type="text" id="registerUsername" placeholder="e.g. diver123" />
+      <h3>Firebase Registration</h3>
+      <label for="registerUsername">Email:</label>
+      <input type="text" id="registerUsername" placeholder="e.g. diver@example.com" />
       <label for="registerPassword">Password:</label>
       <input type="password" id="registerPassword" placeholder="Min 8 chars, letters & digits" />
       <button id="registerButton">Register</button>
@@ -57,9 +58,9 @@
     <!-- Sign In Form -->
     <div id="signInForm" class="form-panel" style="display: none; position: relative;">
       <button class="close-auth" aria-label="Close">&times;</button>
-      <h3>Sign In</h3>
-      <label for="signInUsername">Username:</label>
-      <input type="text" id="signInUsername" placeholder="e.g. diver123" />
+      <h3>Firebase Sign In</h3>
+      <label for="signInUsername">Email:</label>
+      <input type="text" id="signInUsername" placeholder="e.g. diver@example.com" />
       <label for="signInPassword">Password:</label>
       <input type="password" id="signInPassword" placeholder="Your password" />
       <button id="signInButton">Sign In</button>
@@ -80,13 +81,15 @@
         <span>S</span><span>n</span><span>o</span><span>r</span><span>k</span><span>e</span><span>l</span><span> </span><span>C</span><span>o</span><span>n</span><span>d</span><span>i</span><span>t</span><span>i</span><span>o</span><span>n</span><span>s</span>
       </h1>
       <p>Check if it's a great day to explore the underwater world!</p>
+      <!-- Optional: A small note indicating Firebase integration -->
+      <p class="firebase-note">Powered by Firebase Authentication & Firestore</p>
     </header>
     <main>
       <!-- Location Selection -->
       <div class="form-container">
         <h2>Select Your Location</h2>
         <p>Click on the map or search below.</p>
-        <p>Select the numbered icons or scroll down to get more information on each location.</p>
+        <p>Select the numbered icons or scroll down for more details.</p>
         <!-- Map -->
         <label for="mapText">Select your snorkeling location on the map:</label>
         <div id="map" aria-label="Map for location selection"></div>
@@ -95,7 +98,6 @@
         <div>
           <label for="location">Or Search for a Location:</label>
           <input type="text" id="location" placeholder="Start typing a location..." />
-          <!-- The "Check Conditions" button was removed -->
         </div>
       </div>
       <!-- Loader -->

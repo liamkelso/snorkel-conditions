@@ -1,6 +1,6 @@
 "use strict";
 
-// Your web app's Firebase configuration (from your Firebase Console)
+// Firebase configuration (unchanged)
 const firebaseConfig = {
   apiKey: "AIzaSyDj3lbuSZDwBbpp9UBDL2hxAfrYhZmIEyY",
   authDomain: "snorkel-conditions.firebaseapp.com",
@@ -9,20 +9,16 @@ const firebaseConfig = {
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-
-// Initialize Firebase services
 const auth = firebase.auth();
-const db = firebase.firestore(); // or firebase.database() for the Realtime Database
-
+const db = firebase.firestore();
 
 // Set the CSS variable to the actual viewport height
 let vh = window.innerHeight * 0.01;
 document.documentElement.style.setProperty('--vh', `${vh}px`);
 
-
 /*
 Global Variables & API Keys
-*/ 
+*/
 let autocomplete;
 let selectedPlace;
 let allTideStations = null;
@@ -34,8 +30,8 @@ let userMarker = null;
 let tideStationsData = null;
 
 /*
-Notifications
-*/ 
+Notifications (unchanged)
+*/
 function showNotification(message, type = 'error', duration = 3000) {
   const notification = document.getElementById("notification");
   notification.textContent = message;
@@ -46,32 +42,26 @@ function showNotification(message, type = 'error', duration = 3000) {
     notification.style.display = "none";
   }, duration);
 }
-
-// Use showNotification in place of alert()
 function showError(message) {
   showNotification(message, 'error');
 }
 
-
-//Makes the tide chart shown in the innerModal
+/*
+Tide Chart Rendering (unchanged)
+*/
 function renderTideChart(tidePredictions) {
-  // Create or get a canvas element in the modal
   let chartCanvas = document.getElementById("tideChart");
   if (!chartCanvas) {
     chartCanvas = document.createElement("canvas");
     chartCanvas.id = "tideChart";
     document.getElementById("modal-content").appendChild(chartCanvas);
   }
-  
-  // Prepare labels and data
   const labels = tidePredictions.map(pred => {
     const date = new Date(pred.t);
     return date.toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' });
   });
   const data = tidePredictions.map(pred => parseFloat(pred.v));
-  
   const ctx = chartCanvas.getContext('2d');
-  // Destroy an existing chart instance if any
   if (chartCanvas.chartInstance) {
     chartCanvas.chartInstance.destroy();
   }
@@ -99,18 +89,16 @@ function renderTideChart(tidePredictions) {
   });
 }
 
-//Start of helper functions
+/*
+Helper Functions (unchanged)
+*/
 function showLoader(show = true) {
   const loader = document.getElementById("loader");
   loader.style.display = show ? "block" : "none";
 }
-
-//Degres to radians
 function toRadians(deg) {
   return deg * Math.PI / 180;
 }
-
-//Compute the distance between two coordinates
 function haversineDistance(lat1, lon1, lat2, lon2) {
   const R = 6371;
   const dLat = toRadians(lat2 - lat1);
@@ -121,113 +109,122 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
-
-// Helper to close the auth forms
 function closeAuthForms() {
   document.getElementById("formsContainer").style.display = "none";
 }
-
-// Attach event listeners to the close buttons in the auth forms
 document.querySelectorAll(".close-auth").forEach(btn => {
   btn.addEventListener("click", closeAuthForms);
 });
 
+/*
+*** Firebase Authentication Changes ***
+Removed localStorage‑based auth functions and replaced them with Firebase methods.
+*/
 
-// User Authentication & Favorites
-function getAllUsers() {
-  const usersJSON = localStorage.getItem("snorkelUsers");
-  return usersJSON ? JSON.parse(usersJSON) : {};
-}
-
-function saveAllUsers(usersObj) {
-  localStorage.setItem("snorkelUsers", JSON.stringify(usersObj));
-}
-//Makes sure password has 8 characters, with letters and numbers
+// Password validation remains the same.
 function isValidPassword(password) {
   return password.length >= 8 && /[A-Za-z]/.test(password) && /[0-9]/.test(password);
 }
 
-//Registers user
+// Registration using Firebase Auth.
 function registerUser(email, password) {
-  // Basic password validation can still be applied
   if (!isValidPassword(password)) {
     showError("Password must be at least 8 characters and contain letters and digits.");
     return;
   }
-  
   auth.createUserWithEmailAndPassword(email, password)
     .then((userCredential) => {
-      // Registration successful
       showNotification("Registration successful! You are now signed in.", 'success');
-      // Optionally, you can store additional user data in Firestore
-      // For example, db.collection('users').doc(userCredential.user.uid).set({ email });
       updateAuthUI();
+      // Clear registration fields after successful signup.
+      document.getElementById("registerUsername").value = "";
+      document.getElementById("registerPassword").value = "";
     })
     .catch((error) => {
       showError(error.message);
     });
 }
 
-
+// Sign in using Firebase Auth.
 function signInUser(email, password) {
   auth.signInWithEmailAndPassword(email, password)
     .then((userCredential) => {
       updateAuthUI();
+      document.getElementById("signInUsername").value = "";
+      document.getElementById("signInPassword").value = "";
     })
     .catch((error) => {
       showError(error.message);
     });
 }
 
-
-function getCurrentUser() {
-  const userJSON = localStorage.getItem("snorkelUser");
-  return userJSON ? JSON.parse(userJSON) : null;
-}
-
-function setCurrentUser(username) {
-  localStorage.setItem("snorkelUser", JSON.stringify({ username }));
-}
-
+// Sign out using Firebase Auth.
 function signOutUser() {
-  localStorage.removeItem("snorkelUser");
+  auth.signOut()
+    .then(() => {
+      updateAuthUI();
+    })
+    .catch((error) => {
+      showError(error.message);
+    });
 }
 
-function loadFavorites(username) {
-  const key = `favorites_${username}`;
-  const favJSON = localStorage.getItem(key);
-  return favJSON ? JSON.parse(favJSON) : [];
+// New: Use Firebase's currentUser instead of localStorage.
+function getCurrentUser() {
+  return auth.currentUser;
 }
 
-function saveFavorites(username, favorites) {
-  const key = `favorites_${username}`;
-  localStorage.setItem(key, JSON.stringify(favorites));
-}
-
-//Managing favorite tide stations
+/*
+*** Firebase Firestore Favorites Changes ***
+Removed localStorage-based favorites management and replaced with Firestore.
+*/
 function toggleFavoriteStation(stationObj) {
   const user = getCurrentUser();
   if (!user) {
     showNotification("Please sign in to save favorites.", 'error');
     return;
   }
-  const username = user.username;
-  let favorites = loadFavorites(username);
-  const index = favorites.findIndex((fav) => fav.stationId === stationObj.stationId);
-  if (index >= 0) {
-    // Remove favorite
-    favorites.splice(index, 1);
-    showNotification(`Removed ${stationObj.stationName} from favorites.`, 'success');
-  } else {
-    // Prompt for a custom note (optional)
-    const note = prompt("Add a custom note for this favorite (optional):", "");
-    stationObj.note = note;
-    stationObj.lastFetched = new Date().toISOString();
-    favorites.push(stationObj);
-    showNotification(`Added ${stationObj.stationName} to favorites.`, 'success');
+  const favRef = db.collection('users').doc(user.uid).collection('favorites').doc(stationObj.stationId);
+  favRef.get().then((doc) => {
+    if (doc.exists) {
+      // Remove favorite from Firestore.
+      favRef.delete().then(() => {
+        showNotification(`Removed ${stationObj.stationName} from favorites.`, 'success');
+        renderFavorites();
+      });
+    } else {
+      const note = prompt("Add a custom note for this favorite (optional):", "");
+      stationObj.note = note;
+      stationObj.lastFetched = new Date().toISOString();
+      favRef.set(stationObj).then(() => {
+        showNotification(`Added ${stationObj.stationName} to favorites.`, 'success');
+        renderFavorites();
+      });
+    }
+  }).catch((error) => {
+    showError("Error handling favorite: " + error.message);
+  });
+}
+
+function loadFavorites(callback) {
+  const user = getCurrentUser();
+  if (!user) {
+    callback([]);
+    return;
   }
-  saveFavorites(username, favorites);
-  renderFavorites();
+  db.collection('users').doc(user.uid).collection('favorites')
+    .get()
+    .then((querySnapshot) => {
+      const favorites = [];
+      querySnapshot.forEach((doc) => {
+        favorites.push(doc.data());
+      });
+      callback(favorites);
+    })
+    .catch((error) => {
+      console.error("Error fetching favorites:", error);
+      callback([]);
+    });
 }
 
 function renderFavorites() {
@@ -235,65 +232,44 @@ function renderFavorites() {
   if (!user) return;
   const favoritesList = document.getElementById("favoritesList");
   if (!favoritesList) return;
-  const favorites = loadFavorites(user.username);
-  favoritesList.innerHTML = "";
-  if (favorites.length === 0) {
-    favoritesList.innerHTML = "<p>No favorite spots yet.</p>";
-    return;
-  }
-  favorites.forEach((fav, idx) => {
-    const div = document.createElement("div");
-    div.className = "favorite-item";
-    // Checkbox for multi-select deletion
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.dataset.index = idx;
-    div.appendChild(checkbox);
-    // Thumbnail/icon placeholder
-    const img = document.createElement("img");
-    img.src = "favorite-icon.png"; // Replace with your icon path
-    img.alt = fav.stationName;
-    div.appendChild(img);
-    // Info (including custom note and last-fetched timestamp)
-    const infoDiv = document.createElement("div");
-    infoDiv.className = "favorite-info";
-    infoDiv.innerHTML = `<strong>${fav.stationName}</strong><br>
-      Note: ${fav.note || "None"}<br>
-      Last Fetched: ${new Date(fav.lastFetched).toLocaleString()}`;
-    infoDiv.addEventListener("click", () => {
-      handleFavoriteClick(fav);
-    });
-    div.appendChild(infoDiv);
-    favoritesList.appendChild(div);
-  });
-}
-
-async function handleFavoriteClick(favStation) {
-  try {
-    const predictions = await getTidePredictions(favStation.stationId);
-    const weatherData = await fetchWeatherData(favStation.stationLat, favStation.stationLng);
-    if (!weatherData) {
-      showError("Could not fetch weather data. Please try again.");
+  
+  loadFavorites((favorites) => {
+    favoritesList.innerHTML = "";
+    if (favorites.length === 0) {
+      favoritesList.innerHTML = "<p>No favorite spots yet.</p>";
       return;
     }
-    const stationObj = {
-      stationName: favStation.stationName,
-      stationId: favStation.stationId,
-      stationLat: favStation.stationLat,
-      stationLng: favStation.stationLng,
-      predictions
-    };
-    showFullStationDetail(stationObj, weatherData);
-  } catch (error) {
-    console.error("Error fetching favorite station data:", error);
-    showError("Could not fetch tide data for this station. Please try again.");
-  }
+    favorites.forEach((fav, idx) => {
+      const div = document.createElement("div");
+      div.className = "favorite-item";
+      // Checkbox for multi-select deletion.
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.dataset.index = idx;
+      div.appendChild(checkbox);
+      // Thumbnail/icon placeholder.
+      const img = document.createElement("img");
+      img.src = "favorite-icon.png"; // Replace with your icon path.
+      img.alt = fav.stationName;
+      div.appendChild(img);
+      // Info section.
+      const infoDiv = document.createElement("div");
+      infoDiv.className = "favorite-info";
+      infoDiv.innerHTML = `<strong>${fav.stationName}</strong><br>
+                           Note: ${fav.note || "None"}<br>
+                           Last Fetched: ${new Date(fav.lastFetched).toLocaleString()}`;
+      infoDiv.addEventListener("click", () => {
+        handleFavoriteClick(fav);
+      });
+      div.appendChild(infoDiv);
+      favoritesList.appendChild(div);
+    });
+  });
 }
 
 function deleteSelectedFavorites() {
   const user = getCurrentUser();
   if (!user) return;
-  let favorites = loadFavorites(user.username);
   const checkboxes = document.querySelectorAll("#favoritesList input[type='checkbox']");
   const indicesToDelete = [];
   checkboxes.forEach(cb => {
@@ -305,12 +281,27 @@ function deleteSelectedFavorites() {
     showNotification("No favorites selected for deletion.", 'error');
     return;
   }
-  favorites = favorites.filter((fav, idx) => !indicesToDelete.includes(idx));
-  saveFavorites(user.username, favorites);
-  renderFavorites();
-  showNotification("Selected favorites removed.", 'success');
+  loadFavorites((favorites) => {
+    const batch = db.batch();
+    favorites.forEach((fav, index) => {
+      if (indicesToDelete.includes(index)) {
+        const favDoc = db.collection('users').doc(user.uid).collection('favorites').doc(fav.stationId);
+        batch.delete(favDoc);
+      }
+    });
+    batch.commit().then(() => {
+      showNotification("Selected favorites removed.", 'success');
+      renderFavorites();
+    }).catch(error => {
+      showError("Error deleting favorites: " + error.message);
+    });
+  });
 }
 
+/*
+Update the Authentication UI.
+Now uses Firebase's currentUser.
+*/
 function updateAuthUI() {
   const user = getCurrentUser();
   const registerLink = document.getElementById("registerLink");
@@ -342,22 +333,20 @@ function showRegisterForm() {
   document.getElementById("registerForm").style.display = "block";
   document.getElementById("signInForm").style.display = "none";
 }
-
 function showSignInForm() {
   document.getElementById("formsContainer").style.display = "block";
   document.getElementById("registerForm").style.display = "none";
   document.getElementById("signInForm").style.display = "block";
 }
-
 function toggleFavoritesContainer() {
   const favoritesContainer = document.getElementById("favoritesContainer");
   favoritesContainer.style.display = (favoritesContainer.style.display === "none" || !favoritesContainer.style.display)
     ? "block" : "none";
 }
 
-// -----------------------------
-// Google Maps & Places
-// -----------------------------
+/*
+Google Maps & Places (unchanged)
+*/
 function initializeAutocomplete() {
   const input = document.getElementById("location");
   if (!input) return console.error("Location input not found.");
@@ -382,7 +371,6 @@ function initializeAutocomplete() {
     fetchTideData(selectedPlace.lat, selectedPlace.lng);
   });
 }
-
 function centerMapAndPlaceUserMarker(lat, lng) {
   map.setCenter({ lat, lng });
   if (userMarker) userMarker.setMap(null);
@@ -393,9 +381,9 @@ function centerMapAndPlaceUserMarker(lat, lng) {
   });
 }
 
-// -----------------------------
-// Location, Weather, and Tides
-// -----------------------------
+/*
+Location, Weather, and Tides (unchanged)
+*/
 function displayLocationInfo(name, lat, lng) {
   const resultDiv = document.getElementById("result");
   if (!resultDiv) return;
@@ -409,8 +397,6 @@ function displayLocationInfo(name, lat, lng) {
     </div>
   `;
 }
-
-// NEW: Helper to build an hourly forecast table (for the overlay only)
 function generateHourlyForecastTable(weatherData) {
   const hourlyData = weatherData.hourly || [];
   const next6Hours = hourlyData.slice(0, 6);
@@ -443,6 +429,48 @@ function generateHourlyForecastTable(weatherData) {
   return tableHTML;
 }
 
+async function displayWeatherForLocation(lat, lon) {
+  const weatherData = await fetchWeatherData(lat, lon);
+  if (!weatherData) {
+    console.warn("No weather data found.");
+    return;
+  }
+  currentWeatherData = weatherData;
+  const { temp, wind_speed, wind_deg, clouds, uvi } = weatherData.current;
+  const name = selectedPlace?.name || "your location";
+  const directions = ["North", "North-Northeast", "Northeast", "East-Northeast",
+                      "East", "East-Southeast", "Southeast", "South-Southeast",
+                      "South", "South-Southwest", "Southwest", "West-Southwest",
+                      "West", "West-Northwest", "Northwest", "North-Northwest", "North"];
+  const index = (wind_deg !== undefined) ? Math.round((wind_deg % 360) / 22.5) : 0;
+  const weatherDiv = document.getElementById("weatherInfo");
+  let weatherHTML = `<h2>Current Weather in ${name}</h2><ul>`;
+  if (temp !== undefined) weatherHTML += `<li>Air Temperature: ${temp} °F</li>`;
+  if (wind_speed !== undefined) {
+    weatherHTML += `<li>Wind: ${wind_speed} mph from the ${directions[index]}</li>`;
+  }
+  if (clouds !== undefined) weatherHTML += `<li>Cloud Coverage: ${clouds}%</li>`;
+  if (uvi !== undefined) weatherHTML += `<li>UV Index: ${uvi}</li>`;
+  weatherHTML += "</ul>";
+  weatherDiv.innerHTML = weatherHTML;
+}
+
+async function fetchWeatherData(lat, lon, retries = 3) {
+  const weatherUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&units=imperial&exclude=minutely,daily,alerts&appid=${OPENWEATHER_API_KEY}`;
+  while (retries > 0) {
+    try {
+      const response = await fetch(weatherUrl);
+      if (!response.ok) { retries--; continue; }
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching weather data:", error);
+      retries--;
+    }
+  }
+  console.error("Failed to fetch weather data after multiple attempts.");
+  return null;
+}
+
 async function getAllTideStations() {
   if (allTideStations) return allTideStations;
   const stationsUrl = "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations.json?type=tidepredictions";
@@ -452,7 +480,6 @@ async function getAllTideStations() {
   allTideStations = data.stations || data.stationList || [];
   return allTideStations;
 }
-
 async function getTidePredictions(stationId) {
   const tideUrl = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&station=${stationId}&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=hilo&units=english&format=json&application=SnorkelApp`;
   const response = await fetch(tideUrl);
@@ -460,7 +487,6 @@ async function getTidePredictions(stationId) {
   const data = await response.json();
   return data.predictions || [];
 }
-
 async function fetchTideData(lat, lon) {
   showLoader(true);
   try {
@@ -489,42 +515,28 @@ async function fetchTideData(lat, lon) {
     showLoader(false);
   }
 }
-
 function addTideStationMarkers(stations) {
-  // Remove any existing markers
   tideMarkers.forEach((m) => m.setMap(null));
   tideMarkers = [];
-  
-  // Create a LatLngBounds object to automatically adjust the map's viewport
   const bounds = new google.maps.LatLngBounds();
-  
   stations.forEach((station, index) => {
     const position = { lat: station.lat, lng: station.lng };
     const marker = new google.maps.Marker({
       position: position,
-      map: map,
+      map,
       title: station.name,
       label: (index + 1).toString()
     });
     tideMarkers.push(marker);
-    
-    // Extend the bounds to include this marker's position
     bounds.extend(marker.getPosition());
-    
-    // Add a click listener to open the station details when the marker is clicked
     marker.addListener("click", () => showTideStationDetail(index));
   });
-  
-  // Adjust the map viewport so that all markers are visible
   map.fitBounds(bounds);
 }
-
-
 function displayTideData(tideData) {
   tideStationsData = tideData;
   const tideDiv = document.getElementById("tideInfo");
   if (!tideDiv) return;
-  // Updated header with clearer instructions:
   let tideHTML = `
     <h2>Closest Tide Stations</h2>
     <p>
@@ -573,7 +585,6 @@ function displayTideData(tideData) {
     });
   });
 }
-
 function showTideStationDetail(index) {
   if (!tideStationsData || !tideStationsData[index]) {
     console.warn("Invalid station index:", index);
@@ -582,7 +593,6 @@ function showTideStationDetail(index) {
   const station = tideStationsData[index];
   showFullStationDetail(station, currentWeatherData);
 }
-
 function analyzeTidePredictions(predictions) {
   const sorted = predictions.map(p => ({
     time: new Date(p.t),
@@ -611,68 +621,15 @@ function analyzeTidePredictions(predictions) {
   return { lastEvent, nextEvent, tideTrend, nextHigh, nextLow };
 }
 
-// -----------------------------
-// Modification: Include UV Index in Weather Data
-// -----------------------------
-async function displayWeatherForLocation(lat, lon) {
-  const weatherData = await fetchWeatherData(lat, lon);
-  if (!weatherData) {
-    console.warn("No weather data found.");
-    return;
-  }
-  currentWeatherData = weatherData;
-  const { temp, wind_speed, wind_deg, clouds, uvi } = weatherData.current;
-  const name = selectedPlace?.name || "your location";
-  const directions = ["North", "North-Northeast", "Northeast", "East-Northeast",
-                      "East", "East-Southeast", "Southeast", "South-Southeast",
-                      "South", "South-Southwest", "Southwest", "West-Southwest",
-                      "West", "West-Northwest", "Northwest", "North-Northwest", "North"];
-  const index = (wind_deg !== undefined) ? Math.round((wind_deg % 360) / 22.5) : 0;
-  const weatherDiv = document.getElementById("weatherInfo");
-  let weatherHTML = `<h2>Current Weather in ${name}</h2><ul>`;
-  if (temp !== undefined) weatherHTML += `<li>Air Temperature: ${temp} °F</li>`;
-  if (wind_speed !== undefined) {
-    weatherHTML += `<li>Wind: ${wind_speed} mph from the ${directions[index]}</li>`;
-  }
-  if (clouds !== undefined) weatherHTML += `<li>Cloud Coverage: ${clouds}%</li>`;
-  if (uvi !== undefined) weatherHTML += `<li>UV Index: ${uvi}</li>`;
-  weatherHTML += "</ul>";
-  weatherDiv.innerHTML = weatherHTML;
-}
-
-async function fetchWeatherData(lat, lon, retries = 3) {
-  const weatherUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&units=imperial&exclude=minutely,daily,alerts&appid=${OPENWEATHER_API_KEY}`;
-  while (retries > 0) {
-    try {
-      const response = await fetch(weatherUrl);
-      if (!response.ok) { retries--; continue; }
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching weather data:", error);
-      retries--;
-    }
-  }
-  console.error("Failed to fetch weather data after multiple attempts.");
-  return null;
-}
-
-
-
-// -----------------------------
-// Tide Details with Chart and UV Data
-// -----------------------------
+/*
+Tide Details with Chart and UV Data (unchanged)
+*/
 function showFullStationDetail(station, weatherData) {
   const { lastEvent, nextEvent, tideTrend, nextHigh, nextLow } = analyzeTidePredictions(station.predictions);
   const formatTime = d => d.toLocaleString("en-US", { hour: "numeric", minute: "numeric", hour12: true });
-
-  // Prepare tide chart and forecast HTML
   const tideChartHTML = '<canvas id="tideChart"></canvas>';
   const hourlyTableHTML = generateHourlyForecastTable(weatherData);
-
-  // Build header (location name) that spans full width and is centered
   const headerHTML = `<h2 class="modal-location">${station.stationName}</h2>`;
-
-  // If no tide events have occurred, show a simpler layout
   if (!lastEvent) {
     const contentHTML = `
       <div class="modal-content-inner">
@@ -684,7 +641,7 @@ function showFullStationDetail(station, weatherData) {
         </div>
         <div class="modal-right">
           <div class="modal-chart">
-          <p><strong>Tide Forecast (ft)</strong></p> 
+            <p><strong>Tide Forecast (ft)</strong></p> 
             ${tideChartHTML}
           </div>
           <div class="modal-forecast">
@@ -697,8 +654,6 @@ function showFullStationDetail(station, weatherData) {
     renderTideChart(station.predictions);
     return;
   }
-  
-  // For normal cases, build left column (text) content
   const currentTideType = lastEvent.type === "H" ? "High Tide" : "Low Tide";
   const currentTideHeight = `${lastEvent.height.toFixed(1)} ft`;
   let trendDescription = `Currently ${tideTrend === "rising" ? "Rising" : "Falling"}`;
@@ -713,7 +668,6 @@ function showFullStationDetail(station, weatherData) {
   }
   const nextHighText = nextHigh ? formatTime(nextHigh.time) : "Not available.";
   const nextLowText = nextLow ? formatTime(nextLow.time) : "Not available.";
-  
   const snorkelingHTML = `
     <h3>Current Conditions</h3>
     <p><strong>Water Clarity:</strong> ${ (weatherData?.current?.clouds ?? 10) < 30 && (weatherData?.current?.wind_speed ?? 5) < 10 ? "Likely good visibility." : "Visibility may be reduced." }</p>
@@ -721,7 +675,6 @@ function showFullStationDetail(station, weatherData) {
     <p><strong>Tide Impact:</strong> ${currentTideType === "Low Tide" && tideTrend === "falling" ? "Low tide may expose shallow areas." : tideTrend === "rising" ? "Rising tide – improving depth." : "Neutral tide impact."}</p>
     <p><strong>Overall Rating:</strong> ${tideTrend === "rising" && (weatherData?.current?.wind_speed ?? 5) < 10 && (weatherData?.current?.clouds ?? 10) < 30 ? "Good" : ((weatherData?.current?.wind_speed ?? 5) > 15 || (weatherData?.current?.clouds ?? 10) > 70 ? "Poor" : "Fair")}</p>
   `;
-  
   const weatherHTML = `
     <h3>Weather Overview</h3>
     <p>${Math.round(weatherData?.current?.temp ?? 75)}°F, ${(weatherData?.current?.clouds ?? 10) < 30 ? "Sunny/Clear" : "Cloudy"}, Wind: ${weatherData?.current?.wind_speed?.toFixed(0)} mph ${["North", "North-Northeast", "Northeast", "East-Northeast",
@@ -730,7 +683,6 @@ function showFullStationDetail(station, weatherData) {
       "West", "West-Northwest", "Northwest", "North-Northwest", "North"][Math.round((weatherData?.current?.wind_deg ?? 0) % 360 / 22.5)]}</p>
     <p><strong>UV Index:</strong> ${weatherData?.current?.uvi ?? "N/A"}</p>
   `;
-  
   const leftColumnHTML = `
     ${snorkelingHTML}
     ${weatherHTML}
@@ -738,12 +690,10 @@ function showFullStationDetail(station, weatherData) {
     <p><strong>Tide Trend:</strong> ${trendDescription}</p>
     <p><strong>Next High Tide:</strong> ${nextHighText} | <strong>Next Low Tide:</strong> ${nextLowText}</p>
   `;
-  
-  // Build right column: two equal parts (tide chart and hourly forecast)
   const rightColumnHTML = `
     <div class="modal-right">
       <div class="modal-chart">
-      <p><strong>Tide Forecast (ft)</strong></p> 
+        <p><strong>Tide Forecast (ft)</strong></p> 
         ${tideChartHTML}
       </div>
       <div class="modal-forecast">
@@ -751,8 +701,6 @@ function showFullStationDetail(station, weatherData) {
       </div>
     </div>
   `;
-  
-  // Combine header, left column, and right column into the final layout
   const html = `
     ${headerHTML}
     <div class="modal-content-inner">
@@ -766,9 +714,9 @@ function showFullStationDetail(station, weatherData) {
   renderTideChart(station.predictions);
 }
 
-// -----------------------------
-// Responsive Overlay Functions
-// -----------------------------
+/*
+Responsive Overlay Functions (unchanged)
+*/
 function openModal(content) {
   const modal = document.getElementById("modal");
   const modalContent = document.getElementById("modal-content");
@@ -777,11 +725,9 @@ function openModal(content) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
   modal.focus();
 }
-
 function closeModal() {
   document.getElementById("modal").style.display = "none";
 }
-
 function showHelp() {
   const helpContent = `
     <h2>Website Help</h2>
@@ -799,10 +745,9 @@ function showHelp() {
   document.querySelector(".modal-inner").classList.add("help-modal");
 }
 
-
-// -----------------------------
-// Window onLoad Initialization
-// -----------------------------
+/*
+Window onLoad Initialization (updated event listeners)
+*/
 window.onload = () => {
   initializeAutocomplete();
   const defaultCenter = { lat: 39.8283, lng: -98.5795 };
@@ -819,40 +764,28 @@ window.onload = () => {
     await displayWeatherForLocation(lat, lng);
     fetchTideData(lat, lng);
   });
-  // Removed the "Check Conditions" button event listener (data loads automatically)
   document.getElementById("registerLink").addEventListener("click", showRegisterForm);
   document.getElementById("signInLink").addEventListener("click", showSignInForm);
-  document.getElementById("signOutLink").addEventListener("click", () => {
-    signOutUser();
-    updateAuthUI();
-  });
+  document.getElementById("signOutLink").addEventListener("click", signOutUser);
   document.getElementById("viewFavoritesLink").addEventListener("click", toggleFavoritesContainer);
   document.getElementById("helpButton").addEventListener("click", showHelp);
   document.getElementById("registerButton").addEventListener("click", () => {
-    const username = document.getElementById("registerUsername").value.trim();
+    const email = document.getElementById("registerUsername").value.trim();
     const password = document.getElementById("registerPassword").value;
-    if (!username || !password) {
-      showNotification("Please enter a username and password.", 'error');
+    if (!email || !password) {
+      showNotification("Please enter an email and password.", 'error');
       return;
     }
-    if (registerUser(username, password)) {
-      document.getElementById("registerUsername").value = "";
-      document.getElementById("registerPassword").value = "";
-      showSignInForm();
-    }
+    registerUser(email, password);
   });
   document.getElementById("signInButton").addEventListener("click", () => {
-    const username = document.getElementById("signInUsername").value.trim();
+    const email = document.getElementById("signInUsername").value.trim();
     const password = document.getElementById("signInPassword").value;
-    if (!username || !password) {
-      showNotification("Please enter username and password.", 'error');
+    if (!email || !password) {
+      showNotification("Please enter an email and password.", 'error');
       return;
     }
-    if (signInUser(username, password)) {
-      document.getElementById("signInUsername").value = "";
-      document.getElementById("signInPassword").value = "";
-      updateAuthUI();
-    }
+    signInUser(email, password);
   });
   document.getElementById("close-modal").addEventListener("click", closeModal);
   document.getElementById("deleteSelectedFavorites").addEventListener("click", deleteSelectedFavorites);

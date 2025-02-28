@@ -5,6 +5,9 @@ import fetch from 'node-fetch';
 const app = express();
 const PORT = 3000;
 
+// Serve static files from the "public" folder
+app.use(express.static('frontend'));
+
 app.use(cors()); // Enable CORS for all routes
 
 app.use(express.json());
