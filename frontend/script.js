@@ -169,22 +169,16 @@ function registerUser(email, password) {
 }
 
 
-//Sign in function
-function signInUser(username, password) {
-  const users = getAllUsers();
-  const userData = users[username];
-  if (!userData) {
-    showError("No such user. Please register first.");
-    return false;
-  }
-  //Checks if password matches
-  if (userData.password !== password) {
-    showError("Incorrect password. Please try again.");
-    return false;
-  }
-  setCurrentUser(username);
-  return true;
+function signInUser(email, password) {
+  auth.signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      updateAuthUI();
+    })
+    .catch((error) => {
+      showError(error.message);
+    });
 }
+
 
 function getCurrentUser() {
   const userJSON = localStorage.getItem("snorkelUser");
