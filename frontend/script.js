@@ -7,7 +7,6 @@ const firebaseConfig = {
   projectId: "snorkel-conditions",
 };
 
-
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
@@ -149,24 +148,26 @@ function isValidPassword(password) {
 }
 
 //Registers user
-function registerUser(username, password) {
-  const users = getAllUsers();
-  //Ensures no duplicate usernames
-  if (users[username]) {
-    showError("That username is already taken. Please choose another.");
-    return false;
-  }
-  //Checks password
+function registerUser(email, password) {
+  // Basic password validation can still be applied
   if (!isValidPassword(password)) {
     showError("Password must be at least 8 characters and contain letters and digits.");
-    return false;
+    return;
   }
-  //Connects username to password
-  users[username] = { password };
-  saveAllUsers(users);
-  showNotification("Registration successful! You can now sign in.", 'success');
-  return true;
+  
+  auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      // Registration successful
+      showNotification("Registration successful! You are now signed in.", 'success');
+      // Optionally, you can store additional user data in Firestore
+      // For example, db.collection('users').doc(userCredential.user.uid).set({ email });
+      updateAuthUI();
+    })
+    .catch((error) => {
+      showError(error.message);
+    });
 }
+
 
 //Sign in function
 function signInUser(username, password) {
