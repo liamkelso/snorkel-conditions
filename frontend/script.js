@@ -1,5 +1,21 @@
 "use strict";
 
+// Your web app's Firebase configuration (from your Firebase Console)
+const firebaseConfig = {
+  apiKey: "AIzaSyDj3lbuSZDwBbpp9UBDL2hxAfrYhZmIEyY",
+  authDomain: "snorkel-conditions.firebaseapp.com",
+  projectId: "snorkel-conditions",
+};
+
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Initialize Firebase services
+const auth = firebase.auth();
+const db = firebase.firestore(); // or firebase.database() for the Realtime Database
+
+
 // Set the CSS variable to the actual viewport height
 let vh = window.innerHeight * 0.01;
 document.documentElement.style.setProperty('--vh', `${vh}px`);
