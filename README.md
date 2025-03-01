@@ -10,6 +10,7 @@ Snorkel Conditions is a responsive web application that aggregates real-time NOA
 - **User Authentication & Favorites:** Register, sign in, and manage your favorite snorkeling spots with custom notes.
 - **Responsive & Accessible:** Designed to work seamlessly across devices, with keyboard accessibility and ARIA labels to enhance the user experience.
 - **Modern UI/UX:** Features custom gradients, subtle animations, micro‑interactions (like button ripple effects and hover effects), and a polished two‑column modal layout.
+- **User database:** Firebase and firestore database that stores user information
 
 ## Usage
 
@@ -23,6 +24,7 @@ Visit [snorkelconditions.com] (https://snorkelconditions.com) in your browser. S
 - **NOAA Tides API**
 - **Chart.js**
 - **Git & GitHub**
+- **Firebase and Firestore**
 
 ## Contributing
 
