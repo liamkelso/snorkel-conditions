@@ -169,6 +169,27 @@ function signOutUser() {
     });
 }
 
+// Add this near your other event listeners in window.onload or after DOM load.
+document.getElementById("forgotPasswordButton").addEventListener("click", () => {
+  // Retrieve the email from the sign in input field.
+  const email = document.getElementById("signInUsername").value.trim();
+  
+  if (!email) {
+    showNotification("Please enter your email to reset your password.", "error");
+    return;
+  }
+  
+  // Send the password reset email using Firebase's built-in method.
+  auth.sendPasswordResetEmail(email)
+    .then(() => {
+      showNotification("Password reset email sent. Check your inbox.", "success");
+    })
+    .catch((error) => {
+      showError("Error sending reset email: " + error.message);
+    });
+});
+
+
 // New: Use Firebase's currentUser instead of localStorage.
 function getCurrentUser() {
   return auth.currentUser;
