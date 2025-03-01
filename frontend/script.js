@@ -267,6 +267,28 @@ function renderFavorites() {
   });
 }
 
+async function handleFavoriteClick(favStation) {
+  try {
+    const predictions = await getTidePredictions(favStation.stationId);
+    const weatherData = await fetchWeatherData(favStation.stationLat, favStation.stationLng);
+    if (!weatherData) {
+      showError("Could not fetch weather data. Please try again.");
+      return;
+    }
+    const stationObj = {
+      stationName: favStation.stationName,
+      stationId: favStation.stationId,
+      stationLat: favStation.stationLat,
+      stationLng: favStation.stationLng,
+      predictions
+    };
+    showFullStationDetail(stationObj, weatherData);
+  } catch (error) {
+    console.error("Error fetching favorite station data:", error);
+    showError("Could not fetch tide data for this station. Please try again.");
+  }
+}
+
 function deleteSelectedFavorites() {
   const user = getCurrentUser();
   if (!user) return;
