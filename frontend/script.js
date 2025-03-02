@@ -253,40 +253,65 @@ function renderFavorites() {
   if (!user) return;
   const favoritesList = document.getElementById("favoritesList");
   if (!favoritesList) return;
-  
+
   loadFavorites((favorites) => {
     favoritesList.innerHTML = "";
     if (favorites.length === 0) {
       favoritesList.innerHTML = "<p>No favorite spots yet.</p>";
       return;
     }
+    
     favorites.forEach((fav, idx) => {
-      const div = document.createElement("div");
-      div.className = "favorite-item";
-      // Checkbox for multi-select deletion.
+      // Create a card container for each favorite
+      const card = document.createElement("div");
+      card.className = "favorite-card";
+      
+      // Checkbox for multi-select deletion
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
+      checkbox.className = "favorite-checkbox";
       checkbox.dataset.index = idx;
-      div.appendChild(checkbox);
-      // Thumbnail/icon placeholder.
-      const img = document.createElement("img");
-      img.src = "favorite-icon.png"; // Replace with your icon path.
-      img.alt = fav.stationName;
-      div.appendChild(img);
-      // Info section.
-      const infoDiv = document.createElement("div");
-      infoDiv.className = "favorite-info";
-      infoDiv.innerHTML = `<strong>${fav.stationName}</strong><br>
-                           Note: ${fav.note || "None"}<br>
-                           Last Fetched: ${new Date(fav.lastFetched).toLocaleString()}`;
-      infoDiv.addEventListener("click", () => {
+      
+      // Create a span with a location pin emoji instead of an image
+      const pinSpan = document.createElement("span");
+      pinSpan.className = "favorite-pin";
+      pinSpan.textContent = "📍";
+      
+      // Details container
+      const detailsDiv = document.createElement("div");
+      detailsDiv.className = "favorite-details";
+      
+      const title = document.createElement("h4");
+      title.textContent = fav.stationName;
+      
+      const note = document.createElement("p");
+      note.className = "favorite-note";
+      note.textContent = `Note: ${fav.note || "None"}`;
+      
+      const timestamp = document.createElement("p");
+      timestamp.className = "favorite-timestamp";
+      timestamp.textContent = `Last Fetched: ${new Date(fav.lastFetched).toLocaleString()}`;
+      
+      detailsDiv.appendChild(title);
+      detailsDiv.appendChild(note);
+      detailsDiv.appendChild(timestamp);
+      
+      // Add a click event on the card to handle showing details
+      card.addEventListener("click", () => {
         handleFavoriteClick(fav);
       });
-      div.appendChild(infoDiv);
-      favoritesList.appendChild(div);
+      
+      // Assemble the card
+      card.appendChild(checkbox);
+      card.appendChild(pinSpan);
+      card.appendChild(detailsDiv);
+      
+      favoritesList.appendChild(card);
     });
   });
 }
+
+
 
 async function handleFavoriteClick(favStation) {
   try {

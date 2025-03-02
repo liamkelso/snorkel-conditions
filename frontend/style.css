@@ -538,6 +538,55 @@
     margin: 15vh auto;
     padding: 15px;
   }
+
+  /* Container for each favorite card */
+.favorite-card {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.favorite-card:hover {
+  transform: scale(1.02);
+}
+
+/* Style for the checkbox */
+.favorite-checkbox {
+  margin-right: 10px;
+}
+
+/* Style for the location pin emoji */
+.favorite-pin {
+  font-size: 1.8rem;
+  margin-right: 10px;
+}
+
+/* Details container for favorite info */
+.favorite-details h4 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.favorite-details .favorite-note {
+  margin: 5px 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.favorite-details .favorite-timestamp {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+
   
   /* ===========================
      MOBILE FIX FOR PORTRAIT
