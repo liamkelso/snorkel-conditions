@@ -698,6 +698,7 @@ function showFullStationDetail(station, weatherData) {
   const tideChartHTML = '<canvas id="tideChart"></canvas>';
   const hourlyTableHTML = generateHourlyForecastTable(weatherData);
   const headerHTML = `<h2 class="modal-location">${station.stationName}</h2>`;
+  
   if (!lastEvent) {
     const contentHTML = `
       <div class="modal-content-inner">
@@ -722,6 +723,7 @@ function showFullStationDetail(station, weatherData) {
     renderTideChart(station.predictions);
     return;
   }
+  
   const currentTideType = lastEvent.type === "H" ? "High Tide" : "Low Tide";
   const currentTideHeight = `${lastEvent.height.toFixed(1)} ft`;
   let trendDescription = `Currently ${tideTrend === "rising" ? "Rising" : "Falling"}`;
@@ -734,23 +736,96 @@ function showFullStationDetail(station, weatherData) {
       trendDescription += ` – ${nextEvent.type === "H" ? "High" : "Low"} Tide in ${timeString}.`;
     }
   }
+  
   const nextHighText = nextHigh ? formatTime(nextHigh.time) : "Not available.";
   const nextLowText = nextLow ? formatTime(nextLow.time) : "Not available.";
+
+  // Calculate individual scores for snorkeling factors
+  const wind = weatherData?.current?.wind_speed ?? 0;
+  const clouds = weatherData?.current?.clouds ?? 0;
+  const uvi = weatherData?.current?.uvi ?? 0;
+  const now = new Date();
+  const currentHour = now.getHours();
+
+  let windScore = 0;
+  if (wind < 10) {
+    windScore = 0;
+  } else if (wind < 15) {
+    windScore = 1;
+  } else if (wind < 20) {
+    windScore = 2;
+  } else {
+    windScore = 3;
+  }
+
+  let cloudScore = 0;
+  if (clouds < 25) {
+    cloudScore = 0;
+  } else if (clouds < 50) {
+    cloudScore = 1;
+  } else if (clouds < 90) {
+    cloudScore = 2;
+  } else {
+    cloudScore = 3;
+  }
+
+  let uviScore = 0;
+  if (uvi <= 7) {
+    uviScore = 0;
+  } else if (uvi <= 10) {
+    uviScore = 1;
+  } else if (uvi <= 11) {
+    uviScore = 2;
+  } else {
+    uviScore = 3;
+  }
+
+  // Tide conditions: best if high tide with rising (bringing in deeper, clearer water)
+  let tideScore = 0;
+  if (currentTideType === "High Tide" && tideTrend === "rising") {
+    tideScore = 0;
+  } else if (currentTideType === "Low Tide" && tideTrend === "falling") {
+    tideScore = 2;
+  } else {
+    tideScore = 1;
+  }
+
+  const totalScore = windScore + cloudScore + uviScore + tideScore;
+  let overallRating = "";
+  // If it is night, override with a poor rating and note the hazards
+  if (currentHour < 6 || currentHour >= 18) {
+    overallRating = "Poor (Nighttime conditions: snorkeling not recommended due to reduced visibility and safety concerns.)";
+  } else {
+    if (totalScore === 0) {
+      overallRating = "Perfect";
+    } else if (totalScore <= 2) {
+      overallRating = "Good";
+    } else if (totalScore <= 4) {
+      overallRating = "Average";
+    } else if (totalScore <= 6) {
+      overallRating = "Below Average";
+    } else {
+      overallRating = "Poor";
+    }
+  }
+
   const snorkelingHTML = `
     <h3>Current Conditions</h3>
-    <p><strong>Water Clarity:</strong> ${ (weatherData?.current?.clouds ?? 10) < 30 && (weatherData?.current?.wind_speed ?? 5) < 10 ? "Likely good visibility." : "Visibility may be reduced." }</p>
-    <p><strong>Wind Impact:</strong> ${weatherData?.current?.wind_speed < 10 ? "Under 10 mph" : weatherData?.current?.wind_speed + " mph"} – ${weatherData?.current?.wind_speed < 10 ? "Minimal impact" : (weatherData?.current?.wind_speed <= 15 ? "Moderate impact" : "Significant impact")}.</p>
-    <p><strong>Tide Impact:</strong> ${currentTideType === "Low Tide" && tideTrend === "falling" ? "Low tide may expose shallow areas." : tideTrend === "rising" ? "Rising tide – improving depth." : "Neutral tide impact."}</p>
-    <p><strong>Overall Rating:</strong> ${tideTrend === "rising" && (weatherData?.current?.wind_speed ?? 5) < 10 && (weatherData?.current?.clouds ?? 10) < 30 ? "Good" : ((weatherData?.current?.wind_speed ?? 5) > 15 || (weatherData?.current?.clouds ?? 10) > 70 ? "Poor" : "Fair")}</p>
+    <p><strong>Water Clarity:</strong> ${clouds < 30 && wind < 10 ? "Excellent clarity with vibrant colors." : "Visibility may be reduced due to cloud cover or wind."}</p>
+    <p><strong>Wind Impact:</strong> ${wind} mph – ${wind < 10 ? "Calm" : (wind <= 15 ? "Light breeze" : (wind < 20 ? "Choppy" : "Very rough"))}.</p>
+    <p><strong>Tide Impact:</strong> ${currentTideType === "Low Tide" && tideTrend === "falling" ? "Low tide may expose shallow areas, reducing depth." : tideTrend === "rising" ? "Rising tide – deeper water for comfortable snorkeling." : "Neutral tide impact."}</p>
+    <p><strong>Overall Rating:</strong> ${overallRating}</p>
   `;
+  
   const weatherHTML = `
     <h3>Weather Overview</h3>
-    <p>${Math.round(weatherData?.current?.temp ?? 75)}°F, ${(weatherData?.current?.clouds ?? 10) < 30 ? "Sunny/Clear" : "Cloudy"}, Wind: ${weatherData?.current?.wind_speed?.toFixed(0)} mph ${["North", "North-Northeast", "Northeast", "East-Northeast",
+    <p>${Math.round(weatherData?.current?.temp ?? 75)}°F, ${clouds < 30 ? "Sunny/Clear" : "Cloudy"}, Wind: ${wind.toFixed(0)} mph ${["North", "North-Northeast", "Northeast", "East-Northeast",
       "East", "East-Southeast", "Southeast", "South-Southeast",
       "South", "South-Southwest", "Southwest", "West-Southwest",
       "West", "West-Northwest", "Northwest", "North-Northwest", "North"][Math.round((weatherData?.current?.wind_deg ?? 0) % 360 / 22.5)]}</p>
-    <p><strong>UV Index:</strong> ${weatherData?.current?.uvi ?? "N/A"}</p>
+    <p><strong>UV Index:</strong> ${uvi}</p>
   `;
+  
   const leftColumnHTML = `
     ${snorkelingHTML}
     ${weatherHTML}
@@ -758,6 +833,7 @@ function showFullStationDetail(station, weatherData) {
     <p><strong>Tide Trend:</strong> ${trendDescription}</p>
     <p><strong>Next High Tide:</strong> ${nextHighText} | <strong>Next Low Tide:</strong> ${nextLowText}</p>
   `;
+  
   const rightColumnHTML = `
     <div class="modal-right">
       <div class="modal-chart">
@@ -769,6 +845,7 @@ function showFullStationDetail(station, weatherData) {
       </div>
     </div>
   `;
+  
   const html = `
     ${headerHTML}
     <div class="modal-content-inner">
@@ -778,6 +855,7 @@ function showFullStationDetail(station, weatherData) {
       ${rightColumnHTML}
     </div>
   `;
+  
   openModal(html);
   renderTideChart(station.predictions);
 }
